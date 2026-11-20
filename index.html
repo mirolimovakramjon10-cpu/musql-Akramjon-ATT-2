@@ -64,46 +64,54 @@
   <ul id="list"></ul>
 
 <script>
-async function load() {
-    const rows = await (await fetch(API)).json();
-    const ul = document.getElementById("list");
-    ul.innerHTML = "";
-    rows.forEach(r => {
-      const li = document.createElement("li");
+    const API = "/.netlify/functions/api";
 
-      // 1. Izoh matni
-      const textDiv = document.createElement("div");
-      textDiv.className = "izoh-matni";
-      textDiv.textContent = r.name;
+    async function load() {
+      const rows = await (await fetch(API)).json();
+      const ul = document.getElementById("list");
+      ul.innerHTML = "";
+      rows.forEach(r => {
+        const li = document.createElement("li");
 
-      // 2. Sana va vaqtni alohida ajratib olish
-      const d = new Date(r.created_at);
-      const kun = d.toLocaleDateString("uz-UZ"); // Masalan: 20.11.2026
-      const soat = d.toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); // Masalan: 20:28:10
+        const textDiv = document.createElement("div");
+        textDiv.className = "izoh-matni";
+        textDiv.textContent = r.name;
 
-      const metaDiv = document.createElement("div");
-      metaDiv.className = "vaqt-qatori";
+        const d = new Date(r.created_at);
+        const kun = d.toLocaleDateString("uz-UZ");
+        const soat = d.toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
-      const kunSpan = document.createElement("span");
-      kunSpan.className = "sana-ramka";
-      kunSpan.textContent = "📅 " + kun;
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "vaqt-qatori";
 
-      const soatSpan = document.createElement("span");
-      soatSpan.className = "soat-ramka";
-      soatSpan.textContent = "🕒 " + soat;
+        const kunSpan = document.createElement("span");
+        kunSpan.className = "sana-ramka";
+        kunSpan.textContent = "📅 " + kun;
 
-      metaDiv.appendChild(kunSpan);
-      metaDiv.appendChild(soatSpan);
+        const soatSpan = document.createElement("span");
+        soatSpan.className = "soat-ramka";
+        soatSpan.textContent = "🕒 " + soat;
 
-      li.appendChild(textDiv);
-      li.appendChild(metaDiv);
-      ul.appendChild(li);
-    });
-  }
-  load();
-}
+        metaDiv.appendChild(kunSpan);
+        metaDiv.appendChild(soatSpan);
 
-load();
+        li.appendChild(textDiv);
+        li.appendChild(metaDiv);
+        ul.appendChild(li);
+      });
+    }
+
+    async function add() {
+      const input = document.getElementById("name");
+      const name = input.value.trim();
+      if (!name) return;
+      await fetch(API, { method: "POST", body: JSON.stringify({ name }) });
+      input.value = "";
+      load();
+    }
+
+    load();
+  </script>
 </script>
 </body>
 </html>
